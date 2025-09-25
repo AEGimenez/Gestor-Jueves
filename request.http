@@ -96,7 +96,8 @@ GET http://localhost:3000/memberships/user/1
 
 
 ### ------------------- Pruebas de negocio ------------------ ###
-### Intentar actualizar título de tarea (debería fallar)
+###------------------ Actualización de tareas ----------------- ###
+### Intentar actualizar título de tarea (debería fallar). Rta esperada 400 bad request
 PATCH http://localhost:3000/tasks/1
 Content-Type: application/json
 
@@ -104,5 +105,52 @@ Content-Type: application/json
 "title": "Este título no debería guardarse"
 }
 
+### Pasar estado a finalizada (deberia ser valido). Rta esperada 200 ok
+PATCH http://localhost:3000/tasks/2
+Content-Type: application/json
 
+{
+"status": "finalizada"
+}
+
+### Pasar de en_curso a pendiente (deberia fallar). Rta esperada 400 bad request
+PATCH http://localhost:3000/tasks/2
+Content-Type: application/json
+
+{
+"status": "pendiente"
+}
+
+
+###------------------ Fecha limites pasadas -----------------###
+### Intentar crear tarea con fecha límite en el pasado. Rta esperada 400 bad request
+POST http://localhost:3000/tasks
+Content-Type: application/json
+
+{
+"title": "Tarea con fecha pasada",
+"teamId": 1,
+"createdById": 1,
+"dueDate": "2020-01-01"
+}
+
+### Actualizar la Tarea 2 con fecha en el pasado (deberia fallar). Rta esperada 400 bad request
+PATCH http://localhost:3000/tasks/2
+Content-Type: application/json
+
+{
+"dueDate": "2020-01-01"
+}
+
+
+### Crear una tarea con fecha en el futuro. Debe funcionar, rta esperada 201 Created con los datos de la nueva tarea.
+POST http://localhost:3000/tasks
+Content-Type: application/json
+
+{
+"title": "Planificar el despliegue",
+"teamId": 1,
+"createdById": 1,
+"dueDate": "2030-12-31"
+}
 
