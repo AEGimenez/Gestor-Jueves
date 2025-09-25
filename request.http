@@ -1,3 +1,4 @@
+### ------------------- USUARIOS ------------------ ###
 ### Obtener todos los usuarios
 GET http://localhost:3000/users
 
@@ -12,6 +13,8 @@ Content-Type: application/json
   "lastName": "User"
 }
 
+
+### ------------------- EQUIPOS ------------------ ###
 ### Obtener todos los equipos
 GET http://localhost:3000/teams
 
@@ -25,6 +28,8 @@ Content-Type: application/json
   "ownerId": 1
 }
 
+
+### ------------------- TAREAS ------------------ ###
 ### Obtener todas las tareas
 GET http://localhost:3000/tasks?teamId=1
 
@@ -50,6 +55,8 @@ Content-Type: application/json
   "status": "finalizada"
 }
 
+
+### ------------------- COMENTARIOS ------------------ ###
 ### Crear comentario
 POST http://localhost:3000/comments
 Content-Type: application/json
@@ -66,6 +73,9 @@ GET http://localhost:3000/comments
 ### Obtener comentarios de una tarea específica
 GET http://localhost:3000/comments/task/1
 
+
+
+### ------------------- EQUIPOS/USUARIOS ------------------ ###
 ### Agregar usuario a equipo
 POST http://localhost:3000/memberships
 Content-Type: application/json

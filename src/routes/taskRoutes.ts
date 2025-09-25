@@ -10,6 +10,6 @@ router.get("/", TaskController.getAll);
 router.post("/", TaskController.create);
 
 // PUT /tasks/:id/status - Actualizar estado de tarea
-router.put("/:id/status", TaskController.updateStatus);
+router.put("/:id/status", TaskController.update);
 
 export default router;

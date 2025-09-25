@@ -9,134 +9,105 @@ export class TaskController {
   static async getAll(req: Request, res: Response) {
     try {
       const taskRepository = AppDataSource.getRepository(Task);
-      
-      // Incluimos todas las relaciones
       const tasks = await taskRepository.find({
-        relations: ["team", "createdBy", "assignedTo"]
+        relations: ["team", "createdBy", "assignedTo"],
       });
-      
-      res.json({
-        message: "Tareas obtenidas correctamente",
-        data: tasks
-      });
+      // Respuesta simplificada, solo los datos.
+      res.json(tasks);
     } catch (error) {
-      res.status(500).json({
-        message: "Error al obtener tareas",
-        error
-      });
+      res.status(500).json({ message: "Error al obtener tareas", error });
     }
   }
 
   // Crear una nueva tarea
   static async create(req: Request, res: Response) {
     try {
-      const { 
-        title, 
-        description, 
-        teamId, 
-        createdById, 
-        assignedToId,
-        priority = TaskPriority.MEDIUM,
-        dueDate 
-      } = req.body;
-      
+      const taskData = req.body;
       const taskRepository = AppDataSource.getRepository(Task);
-      const userRepository = AppDataSource.getRepository(User);
-      const teamRepository = AppDataSource.getRepository(Team);
       
-      // Verificar que el equipo existe
-      const team = await teamRepository.findOne({ where: { id: teamId } });
-      if (!team) {
-        return res.status(404).json({
-          message: "Equipo no encontrado"
-        });
-      }
-
-      // Verificar que el creador existe
-      const createdBy = await userRepository.findOne({ where: { id: createdById } });
-      if (!createdBy) {
-        return res.status(404).json({
-          message: "Usuario creador no encontrado"
-        });
-      }
-
-      // Verificar usuario asignado (si se proporciona)
-      if (assignedToId) {
-        const assignedTo = await userRepository.findOne({ where: { id: assignedToId } });
-        if (!assignedTo) {
-          return res.status(404).json({
-            message: "Usuario asignado no encontrado"
-          });
-        }
-      }
-
-      // Crear nueva tarea
+      // Asignamos directamente los objetos completos a las relaciones
       const newTask = taskRepository.create({
-        title,
-        description,
-        teamId,
-        createdById,
-        assignedToId,
-        priority,
-        dueDate: dueDate ? new Date(dueDate) : undefined
+        ...taskData,
+        team: { id: taskData.teamId },
+        createdBy: { id: taskData.createdById },
+        assignedTo: taskData.assignedToId ? { id: taskData.assignedToId } : undefined,
+        dueDate: taskData.dueDate ? new Date(taskData.dueDate) : undefined,
       });
 
-      // Guardar en la base de datos
       const savedTask = await taskRepository.save(newTask);
-      
-      // Obtener la tarea con todas las relaciones
-      const taskWithRelations = await taskRepository.findOne({
-        where: { id: savedTask.id },
-        relations: ["team", "createdBy", "assignedTo"]
-      });
-      
-      res.status(201).json({
-        message: "Tarea creada correctamente",
-        data: taskWithRelations
-      });
+      res.status(201).json(savedTask);
     } catch (error) {
-      res.status(500).json({
-        message: "Error al crear tarea",
-        error
-      });
+      // Manejo de errores más específico para claves foráneas
+      if (typeof error === "object" && error !== null && "message" in error && typeof (error as any).message === "string" && (error as any).message.includes("FOREIGN KEY constraint failed")) {
+        return res.status(404).json({ message: "Equipo, creador o usuario asignado no encontrado." });
+      }
+      res.status(500).json({ message: "Error al crear tarea", error });
     }
   }
 
-  // Actualizar estado de tarea
-  static async updateStatus(req: Request, res: Response) {
+  // --- NUEVOS MÉTODOS ---
+
+  // Obtener una tarea por ID
+  static async getOneById(req: Request, res: Response) {
     try {
-      const { id } = req.params;
-      const { status } = req.body;
-      
+      const id = parseInt(req.params.id);
       const taskRepository = AppDataSource.getRepository(Task);
-      
-      // Verificar que la tarea existe
-      const task = await taskRepository.findOne({ where: { id: parseInt(id) } });
+      const task = await taskRepository.findOne({
+        where: { id },
+        relations: ["team", "createdBy", "assignedTo", "comments", "comments.author"],
+      });
+
       if (!task) {
-        return res.status(404).json({
-          message: "Tarea no encontrada"
-        });
+        return res.status(404).json({ message: "Tarea no encontrada" });
       }
 
-      // Actualizar estado
-      task.status = status;
-      const updatedTask = await taskRepository.save(task);
-      
-      // Obtener con relaciones
-      const taskWithRelations = await taskRepository.findOne({
-        where: { id: updatedTask.id },
-        relations: ["team", "createdBy", "assignedTo"]
-      });
-      
-      res.json({
-        message: "Estado de tarea actualizado",
-        data: taskWithRelations
-      });
+      res.json(task);
     } catch (error) {
-      res.status(500).json({
-        message: "Error al actualizar estado",
-        error
-      });
+      res.status(500).json({ message: "Error al obtener la tarea", error });
+    }
+  }
+
+  // Actualizar una tarea por ID (usando PATCH)
+  static async update(req: Request, res: Response) {
+    try {
+      const id = parseInt(req.params.id);
+      const updates = req.body;
+      const taskRepository = AppDataSource.getRepository(Task);
+
+      const task = await taskRepository.findOneBy({ id });
+      if (!task) {
+        return res.status(404).json({ message: "Tarea no encontrada" });
+      }
+
+      // TODO: Implementar reglas de negocio aquí
+      // ej: if (task.status === TaskStatus.COMPLETED) { throw new Error(...) }
+
+      // Actualiza la entidad con los nuevos datos
+      taskRepository.merge(task, updates);
+      const updatedTask = await taskRepository.save(task);
+
+      res.json(updatedTask);
+    } catch (error) {
+      res.status(500).json({ message: "Error al actualizar la tarea", error });
+    }
+  }
+
+  // Eliminar una tarea por ID
+  static async delete(req: Request, res: Response) {
+    try {
+      const id = parseInt(req.params.id);
+      const taskRepository = AppDataSource.getRepository(Task);
+
+      const result = await taskRepository.delete(id);
+
+      if (result.affected === 0) {
+        return res.status(404).json({ message: "Tarea no encontrada" });
+      }
+
+      // 204 No Content es la respuesta estándar para un borrado exitoso
+      res.status(204).send();
+    } catch (error) {
+      res.status(500).json({ message: "Error al eliminar la tarea", error });
     }
   }
 }
