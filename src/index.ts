@@ -19,45 +19,36 @@ app.use(express.json());
 
 // Ruta de prueba
 app.get("/", (req, res) => {
-  res.json({ message: "¡Gestor de Tareas API funcionando!" });
+  res.json({ message: "El gestor está funcionando..." });
 });
 
-// Rutas de usuarios
 app.use("/users", userRoutes);
-
-// Rutas de equipos
 app.use("/teams", teamRoutes);
-
-// Rutas de tareas
 app.use("/tasks", taskRoutes);
-
-// Rutas de comentarios
 app.use("/comments", commentRoutes);
-
-// Rutas de membresías de equipo
 app.use("/memberships", membershipRoutes);
 
-// Nueva ruta para probar la conexión a la BD
+// Probar conexión a la base de datos
 app.get("/test-db", async (req, res) => {
   try {
     if (AppDataSource.isInitialized) {
-      res.json({ message: "Base de datos conectada correctamente!" });
+      res.json({ message: "Se conectó con éxito a la base de datos" });
     } else {
-      res.status(500).json({ message: "Base de datos no conectada" });
+      res.status(500).json({ message: "No se pudo conectar a la base de datos" });
     }
   } catch (error) {
-    res.status(500).json({ message: "Error en la base de datos", error });
+    res.status(500).json({ message: "Error en la conexión con la base de datos", error });
   }
 });
 
 // Inicializar la conexión a la base de datos y arrancar el servidor
 AppDataSource.initialize()
   .then(() => {
-    console.log("✅ Conectado a SQLite");
+    console.log("Conectado a SQLite...");
     app.listen(PORT, () => {
-      console.log(`Servidor corriendo en http://localhost:${PORT}`);
+      console.log(`Servidor activo en: http://localhost:${PORT}`);
     });
   })
   .catch((err) => {
-    console.error("❌ Error conectando a la base de datos:", err);
+    console.error("No se pudo conectar con la base de datos:", err);
   });
