@@ -154,3 +154,6 @@ Content-Type: application/json
 "dueDate": "2030-12-31"
 }
 
+###------------------ Borrado de equipos -----------------###
+### Fallo al intentar borrar equipo con tareas activas. Rta esperada 400 bad request
+DELETE http://localhost:3000/teams/1
