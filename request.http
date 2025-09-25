@@ -1,0 +1,83 @@
+### Obtener todos los usuarios
+GET http://localhost:3000/users
+
+### Crear usuario
+POST http://localhost:3000/users
+Content-Type: application/json
+
+{
+  "email": "test@example.com",
+  "password": "123456",
+  "firstName": "Test",
+  "lastName": "User"
+}
+
+### Obtener todos los equipos
+GET http://localhost:3000/teams
+
+### Crear equipo
+POST http://localhost:3000/teams
+Content-Type: application/json
+
+{
+  "name": "Equipo de Prueba",
+  "description": "Descripción del equipo",
+  "ownerId": 1
+}
+
+### Obtener todas las tareas
+GET http://localhost:3000/tasks?teamId=1
+
+### Crear tarea
+POST http://localhost:3000/tasks
+Content-Type: application/json
+
+{
+  "title": "Nueva tarea",
+  "description": "Descripción de la tarea",
+  "teamId": 1,
+  "createdById": 1,
+  "assignedToId": 1,
+  "priority": "media",
+  "dueDate": "2024-07-01"
+}
+
+### Actualizar estado de tarea
+PUT http://localhost:3000/tasks/1/status
+Content-Type: application/json
+
+{
+  "status": "finalizada"
+}
+
+### Crear comentario
+POST http://localhost:3000/comments
+Content-Type: application/json
+
+{
+  "content": "¡Excelente trabajo!",
+  "taskId": 1,
+  "authorId": 1
+}
+
+### Obtener todos los comentarios
+GET http://localhost:3000/comments
+
+### Obtener comentarios de una tarea específica
+GET http://localhost:3000/comments/task/1
+
+### Agregar usuario a equipo
+POST http://localhost:3000/memberships
+Content-Type: application/json
+
+{
+  "userId": 1,
+  "teamId": 1,
+  "role": "miembro"
+}
+
+### Obtener miembros de un equipo
+GET http://localhost:3000/memberships/team/1
+
+### Obtener equipos de un usuario
+GET http://localhost:3000/memberships/user/1
