@@ -89,6 +89,39 @@ export class TeamController {
       return res.status(500).json({ message: "Error interno al eliminar el equipo" });
     }
   }
+
+    // --- MÉTODO UPDATE ---
+  static async update(req: Request, res: Response) {
+    try {
+      const id = parseInt(req.params.id);
+      const { name, description } = req.body;
+
+      const teamRepository = AppDataSource.getRepository(Team);
+      const team = await teamRepository.findOne({ where: { id } });
+
+      if (!team) {
+        return res.status(404).json({ message: "Equipo no encontrado" });
+      }
+
+      // Solo actualiza los campos enviados
+      if (name !== undefined) team.name = name;
+      if (description !== undefined) team.description = description;
+
+      const updatedTeam = await teamRepository.save(team);
+
+      res.json({
+        message: "Equipo actualizado correctamente",
+        data: updatedTeam
+      });
+    } catch (error) {
+      res.status(500).json({
+        message: "Error al actualizar equipo",
+        error
+      });
+    }
+  }
+
+  
 }
 
 

@@ -12,4 +12,7 @@ router.post("/", TeamController.create);
 // DELETE /teams/:id - Eliminar un equipo
 router.delete("/:id", TeamController.delete); 
 
+// UPDATE /teams/:id - Actualizar un equipo
+router.patch('/:id', TeamController.update);
+
 export default router;
