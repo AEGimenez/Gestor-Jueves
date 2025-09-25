@@ -2,10 +2,10 @@ import { Request, Response } from "express";
 import { AppDataSource } from "../config/database";
 import { Team } from "../entities/Team";
 import { User } from "../entities/User";
-import { TeamService } from "../services/TeamService"; // 1. Importamos el TeamService
+import { TeamService } from "../services/TeamService";
 
 export class TeamController {
-  // Obtener todos los equipos (sin cambios)
+  // Obtener todos los equipos
   static async getAll(req: Request, res: Response) {
     try {
       const teamRepository = AppDataSource.getRepository(Team);
@@ -14,18 +14,18 @@ export class TeamController {
       });
       
       res.json({
-        message: "Equipos obtenidos correctamente",
+        message: "Se obtuvieron los equipos con éxito",
         data: teams
       });
     } catch (error) {
       res.status(500).json({
-        message: "Error al obtener equipos",
+        message: "No se pudieron obtener equipos",
         error
       });
     }
   }
 
-  // Crear un nuevo equipo (sin cambios funcionales)
+  // Crear un nuevo equipo
   static async create(req: Request, res: Response) {
     try {
       const { name, description, ownerId } = req.body;
@@ -35,7 +35,7 @@ export class TeamController {
       const owner = await userRepository.findOne({ where: { id: ownerId } });
       if (!owner) {
         return res.status(404).json({
-          message: "Usuario propietario no encontrado"
+          message: "No se encontró el usuario propietario"
         });
       }
 
@@ -52,45 +52,41 @@ export class TeamController {
       });
       
       res.status(201).json({
-        message: "Equipo creado correctamente",
+        message: "El equipo se creó con éxito",
         data: teamWithOwner
       });
     } catch (error) {
       res.status(500).json({
-        message: "Error al crear equipo",
+        message: "No se pudo crear el equipo",
         error
       });
     }
   }
 
-  // --- MÉTODO DELETE QUE USA EL SERVICIO ---
+  // borrar un equipo por ID
   static async delete(req: Request, res: Response) {
     try {
       const id = parseInt(req.params.id);
-      
-      // 2. Creamos una instancia del servicio
       const teamService = new TeamService();
-
-      // 3. Llamamos al método del servicio, que contiene la regla de negocio
       await teamService.deleteTeam(id);
 
-      // 204 No Content es la respuesta estándar para un borrado exitoso
+      // Respuesta estándar para un borrado exitoso
       res.status(204).send();
 
     } catch (error) {
-      // 4. Capturamos los errores de negocio que vienen del servicio
+      // Capturar los errores de negocio que vienen del servicio
       if (error instanceof Error) {
         if (error.message.includes("Equipo no encontrado")) {
           return res.status(404).json({ message: error.message });
         }
-        // Para la regla de negocio de tareas activas, devolvemos 400 Bad Request.
+        // Para la regla de negocio de tareas activas
         return res.status(400).json({ message: error.message });
       }
-      return res.status(500).json({ message: "Error interno al eliminar el equipo" });
+      return res.status(500).json({ message: "No se pudo eliminar el equipo" });
     }
   }
 
-    // --- MÉTODO UPDATE ---
+  // Actualizar un equipo por ID
   static async update(req: Request, res: Response) {
     try {
       const id = parseInt(req.params.id);

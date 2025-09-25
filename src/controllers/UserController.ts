@@ -10,12 +10,12 @@ export class UserController {
       const users = await userRepository.find();
        
       res.json({
-        message: "Usuarios obtenidos correctamente",
+        message: "Se obtuvieron todos los usuarios",
         data: users
       });
     } catch (error) {
       res.status(500).json({
-        message: "Error al obtener usuarios",
+        message: "No se pudieron obtener los usuarios",
         error
       });
     }
@@ -40,12 +40,12 @@ export class UserController {
       const savedUser = await userRepository.save(newUser);
       
       res.status(201).json({
-        message: "Usuario creado correctamente",
+        message: "Usuario creado con éxito",
         data: savedUser
       });
     } catch (error) {
       res.status(500).json({
-        message: "Error al crear usuario",
+        message: "No se pudo crear el usuario",
         error
       });
     }

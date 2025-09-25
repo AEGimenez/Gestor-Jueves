@@ -8,7 +8,7 @@ import { TeamMembership } from "../entities/TeamMembership";
 
 export const AppDataSource = new DataSource({
   type: "sqlite",
-  database: "gestor_tareas.sqlite", // se crea la base de datos en la raiz del proyecto
+  database: "gestor_tareas.sqlite", 
   synchronize: true,                // crea tablas automáticamente hasta que tengamos migraciones en funcionamiento
   logging: true,
   entities: [User, Team, Task, Comment, TeamMembership],

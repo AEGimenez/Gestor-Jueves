@@ -18,7 +18,7 @@ export class TeamMembershipController {
       const user = await userRepository.findOne({ where: { id: userId } });
       if (!user) {
         return res.status(404).json({
-          message: "Usuario no encontrado"
+          message: "El usuario no existe"
         });
       }
 
@@ -26,7 +26,7 @@ export class TeamMembershipController {
       const team = await teamRepository.findOne({ where: { id: teamId } });
       if (!team) {
         return res.status(404).json({
-          message: "Equipo no encontrado"
+          message: "El equipo no existe"
         });
       }
 
@@ -37,7 +37,7 @@ export class TeamMembershipController {
       
       if (existingMembership) {
         return res.status(400).json({
-          message: "El usuario ya es miembro de este equipo"
+          message: "El usuario ya está en el equipo"
         });
       }
 
@@ -83,7 +83,7 @@ export class TeamMembershipController {
       });
       
       res.json({
-        message: "Miembros del equipo obtenidos correctamente",
+        message: "Se obtuvieron los miembros del equipo correctamente",
         data: members
       });
     } catch (error) {
@@ -108,7 +108,7 @@ export class TeamMembershipController {
       });
       
       res.json({
-        message: "Equipos del usuario obtenidos correctamente",
+        message: "Se obtuvieron los equipos del usuario correctamente",
         data: teams
       });
     } catch (error) {

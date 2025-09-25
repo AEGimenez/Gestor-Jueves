@@ -7,10 +7,10 @@ POST http://localhost:3000/users
 Content-Type: application/json
 
 {
-  "email": "test@example.com",
+  "email": "user@gmail.com",
   "password": "123456",
-  "firstName": "Test",
-  "lastName": "User"
+  "firstName": "User",
+  "lastName": "Test"
 }
 
 
@@ -23,7 +23,7 @@ POST http://localhost:3000/teams
 Content-Type: application/json
 
 {
-  "name": "Equipo de Prueba",
+  "name": "Nombre del equipo",
   "description": "Descripción del equipo",
   "ownerId": 1
 }
@@ -33,8 +33,8 @@ PATCH http://localhost:3000/teams/1
 Content-Type: application/json
 
 {
-  "name": "Nombre actualizado",
-  "description": "Nueva descripción"
+  "name": "Nombre del equipo actualizado",
+  "description": "Descripción del equipo actualizada"
 }
 
 ### ------------------- TAREAS ------------------ ###
@@ -52,7 +52,7 @@ Content-Type: application/json
   "createdById": 1,
   "assignedToId": 1,
   "priority": "media",
-  "dueDate": "2024-07-01"
+  "dueDate": "2025-09-10"
 }
 
 ### Actualizar estado de tarea
@@ -70,7 +70,7 @@ POST http://localhost:3000/comments
 Content-Type: application/json
 
 {
-  "content": "¡Excelente trabajo!",
+  "content": "Este es un comentario de la tarea",
   "taskId": 1,
   "authorId": 1
 }
