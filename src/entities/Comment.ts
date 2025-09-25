@@ -10,7 +10,7 @@ export class Comment {
   @Column("text")
   content!: string;
 
-  // Relación: Un comentario pertenece a UNA tarea
+  // Relación comentario-tarea | M a N |
   @ManyToOne(() => Task)
   @JoinColumn({ name: "task_id" })
   task!: Task;
@@ -18,7 +18,7 @@ export class Comment {
   @Column({ name: "task_id" })
   taskId!: number;
 
-  // Relación: Un comentario tiene UN autor (usuario)
+  // Relación comentario-autor | M a 1 |
   @ManyToOne(() => User)
   @JoinColumn({ name: "author_id" })
   author!: User;

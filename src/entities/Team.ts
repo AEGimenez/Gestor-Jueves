@@ -12,7 +12,6 @@ export class Team {
   @Column({ nullable: true })
   description?: string;
 
-  // Relación: Un equipo tiene UN propietario (usuario)
   @ManyToOne(() => User)
   @JoinColumn({ name: "owner_id" })
   owner!: User;

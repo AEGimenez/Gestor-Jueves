@@ -2,14 +2,13 @@ import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, ManyToOne, Jo
 import { User } from "./User";
 import { Team } from "./Team";
 
-// Roles según tu TPO
 export enum MemberRole {
   OWNER = "propietario",
   MEMBER = "miembro"
 }
 
 @Entity("team_memberships")
-@Unique(["userId", "teamId"]) // Un usuario no puede estar duplicado en el mismo equipo
+@Unique(["userId", "teamId"])
 export class TeamMembership {
   @PrimaryGeneratedColumn()
   id!: number;
@@ -30,7 +29,7 @@ export class TeamMembership {
   @Column({ name: "team_id" })
   teamId!: number;
 
-  // Rol del usuario en este equipo
+  // Rol del usuario
   @Column({
     type: "simple-enum",
     enum: MemberRole,

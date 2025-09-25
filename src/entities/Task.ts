@@ -44,7 +44,6 @@ export class Task {
   @Column({ nullable: true })
   dueDate?: Date;
 
-  // Relación con el equipo al que pertenece
   @ManyToOne(() => Team)
   @JoinColumn({ name: "team_id" })
   team!: Team;
@@ -52,7 +51,7 @@ export class Task {
   @Column({ name: "team_id" })
   teamId!: number;
 
-  // Usuario que creó la tarea
+  // Propietario de la tarea
   @ManyToOne(() => User)
   @JoinColumn({ name: "created_by" })
   createdBy!: User;
@@ -60,7 +59,7 @@ export class Task {
   @Column({ name: "created_by" })
   createdById!: number;
 
-  // Usuario asignado (opcional)
+
   @ManyToOne(() => User, { nullable: true })
   @JoinColumn({ name: "assigned_to" })
   assignedTo?: User;
@@ -68,7 +67,6 @@ export class Task {
   @Column({ name: "assigned_to", nullable: true })
   assignedToId?: number;
 
-  // Relación: Una tarea puede tener MUCHOS comentarios
   @OneToMany("Comment", "task")
   comments!: Comment[];
 
@@ -78,6 +76,4 @@ export class Task {
   @UpdateDateColumn()
   updatedAt!: Date;
 }
-
-// Import después para evitar circular dependency
 import type { Comment } from "./Comment";
