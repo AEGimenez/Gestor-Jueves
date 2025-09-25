@@ -12,4 +12,10 @@ router.post("/", TaskController.create);
 // PUT /tasks/:id/status - Actualizar estado de tarea
 router.put("/:id/status", TaskController.update);
 
+// Rutas para un recurso de tarea específico
+router.get("/:id", TaskController.getOneById);
+router.patch("/:id", TaskController.update); // Usamos PATCH para actualizaciones
+router.delete("/:id", TaskController.delete);
+
+
 export default router;

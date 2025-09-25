@@ -1,3 +1,4 @@
+
 ### ------------------- USUARIOS ------------------ ###
 ### Obtener todos los usuarios
 GET http://localhost:3000/users
@@ -91,3 +92,17 @@ GET http://localhost:3000/memberships/team/1
 
 ### Obtener equipos de un usuario
 GET http://localhost:3000/memberships/user/1
+
+
+
+### ------------------- Pruebas de negocio ------------------ ###
+### Intentar actualizar título de tarea (debería fallar)
+PATCH http://localhost:3000/tasks/1
+Content-Type: application/json
+
+{
+"title": "Este título no debería guardarse"
+}
+
+
+

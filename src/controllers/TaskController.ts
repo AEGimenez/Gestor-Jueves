@@ -1,3 +1,4 @@
+/*
 import { Request, Response } from "express";
 import { AppDataSource } from "../config/database";
 import { Task, TaskStatus, TaskPriority } from "../entities/Task";
@@ -110,4 +111,102 @@ export class TaskController {
       res.status(500).json({ message: "Error al eliminar la tarea", error });
     }
   }
+}*/
+import { Request, Response } from "express";
+import { AppDataSource } from "../config/database";
+import { Task } from "../entities/Task";
+import { TaskService } from "../services/TaskService"; // CORREGIDO: "TaskService" con T mayúscula
+
+export class TaskController {
+  // --- MÉTODOS EXISTENTES (sin cambios) ---
+  static async getAll(req: Request, res: Response) {
+    try {
+      const taskRepository = AppDataSource.getRepository(Task);
+      const tasks = await taskRepository.find({
+        relations: ["team", "createdBy", "assignedTo"],
+      });
+      res.json(tasks);
+    } catch (error) {
+        res.status(500).json({ message: "Error al obtener tareas" });
+    }
+  }
+
+  static async getOneById(req: Request, res: Response) {
+    try {
+      const id = parseInt(req.params.id);
+      const taskRepository = AppDataSource.getRepository(Task);
+      const task = await taskRepository.findOne({
+        where: { id },
+        relations: ["team", "createdBy", "assignedTo", "comments", "comments.author"],
+      });
+      if (!task) {
+        return res.status(404).json({ message: "Tarea no encontrada" });
+      }
+      res.json(task);
+    } catch (error) {
+      res.status(500).json({ message: "Error al obtener la tarea" });
+    }
+  }
+  
+  static async create(req: Request, res: Response) {
+    try {
+      const taskData = req.body;
+      const taskRepository = AppDataSource.getRepository(Task);
+      const newTask = taskRepository.create({
+        ...taskData,
+        team: { id: taskData.teamId },
+        createdBy: { id: taskData.createdById },
+        assignedTo: taskData.assignedToId ? { id: taskData.assignedToId } : undefined,
+        dueDate: taskData.dueDate ? new Date(taskData.dueDate) : undefined,
+      });
+      const savedTask = await taskRepository.save(newTask);
+      res.status(201).json(savedTask);
+    } catch (error) {
+        if (typeof error === "object" && error !== null && "message" in error && typeof (error as any).message === "string" && (error as any).message.includes("FOREIGN KEY constraint failed")) {
+            return res.status(404).json({ message: "Equipo, creador o usuario asignado no encontrado." });
+        }
+        res.status(500).json({ message: "Error al crear tarea" });
+    }
+  }
+
+  // --- MÉTODO UPDATE MODIFICADO ---
+ static async update(req: Request, res: Response) {
+  try {
+    const id = parseInt(req.params.id);
+    const updates = req.body;
+
+    // Bloquear cambios al título
+    if ("title" in updates) {
+      return res.status(400).json({ message: "No se permite modificar el título de la tarea." });
+    }
+
+    const taskService = new TaskService();
+    const updatedTask = await taskService.updateTask(id, updates);
+    res.json(updatedTask);
+  } catch (error) {
+    if (error instanceof Error) {
+      if (error.message.includes("Tarea no encontrada")) {
+        return res.status(404).json({ message: error.message });
+      }
+      return res.status(400).json({ message: error.message });
+    }
+    return res.status(500).json({ message: "Error interno al actualizar la tarea" });
+  }
 }
+  
+  // --- MÉTODO DELETE (sin cambios) ---
+  static async delete(req: Request, res: Response) {
+    try {
+      const id = parseInt(req.params.id);
+      const taskRepository = AppDataSource.getRepository(Task);
+      const result = await taskRepository.delete(id);
+      if (result.affected === 0) {
+        return res.status(404).json({ message: "Tarea no encontrada" });
+      }
+      res.status(204).send();
+    } catch (error) {
+      res.status(500).json({ message: "Error al eliminar la tarea" });
+    }
+  }
+}
+
